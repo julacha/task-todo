@@ -1,5 +1,7 @@
+/** @format */
+
 body {
-    background: rgba(231, 252, 137, 0.986);
+    background: rgb(200, 243, 196);
   }
   form,
   .task-list {
@@ -11,13 +13,12 @@ body {
     width: 100%;
     height: 50px;
   }
-  
   .task-list > div {
     position: relative;
     margin: 5px;
     padding: 7px;
-    border: 2px solid rgb(54, 129, 199);
-    background: rgba(210, 253, 16, 0.411);
+    border: 2px solid rgb(69, 199, 54);
+    background: rgba(128, 250, 114, 0.411);
     display: flex;
     justify-content: space-between;
   }
@@ -30,9 +31,6 @@ body {
     text-decoration: line-through;
   }
   
-  .task-list .template {
-    display: none;
-  }
   .option {
     align-self: center;
     padding: 4px;
@@ -44,6 +42,7 @@ body {
   .save {
     display: none;
   }
+  
   .task-list .editable {
     background: #fff;
   }
@@ -53,6 +52,7 @@ body {
   .editable .option {
     display: none;
   }
+  
   .options {
     display: none;
     position: absolute;
@@ -81,4 +81,3 @@ body {
   .options a:active {
     background: rgb(131, 131, 131);
   }
-  

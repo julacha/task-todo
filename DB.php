@@ -1,4 +1,5 @@
 <?php
+include_once 'template.php';
 class DB
 {
     protected $conn;
@@ -7,7 +8,6 @@ class DB
 
     public function __construct($table_name)
     {
-
         $this->table = $table_name;
         $servername = "localhost";
         $username = "root";
@@ -47,15 +47,13 @@ class DB
 
     public function get()
     {
-        include 'template.php';
         $sql = "SELECT * FROM `$this->table`";
         $result = $this->conn->query($sql);
 
         if ($result) {
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    $this->last_message .= json_encode($row) . "<br>";
-                    template();
+                    template($row['id'], $row['text'], $row['status']);
                 }
             } else {
                 $this->last_message = "0 results";
@@ -80,12 +78,11 @@ class DB
             }
         }
 
-
-        $sql = "INSERT INTO `$this->table` ($columns) VALUES ($values); SELECT LAST_INSERT_ID();";
+        $sql = "INSERT INTO `$this->table` ($columns) VALUES ($values);";
         $result = $this->conn->query($sql);
-
         if ($result === true) {
             $this->last_message = "ieraksts pievienots";
+            return $this->conn->insert_id;
         } else {
             $this->last_message = $sql . "neizdevās inserts";
         }
@@ -115,5 +112,6 @@ class DB
 
     public function delete()
     {
+        echo 'test';
     }
 }

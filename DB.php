@@ -1,65 +1,95 @@
 <?php
-include_once 'template.php';
 class DB
 {
-    protected $conn;
-    protected $table;
-    public $last_message = '';
+    private $con;
+    private $table;
+
 
     public function __construct($table_name)
     {
         $this->table = $table_name;
         $servername = "localhost";
         $username = "root";
-        $password = "";
-        $dbname = "test";
+        $password = "root";
+        $dbname = "tictactoe";
 
-        // Create connection
-        $this->conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($this->conn->connect_error) {
-            die("Connection failed: " . $this->conn->connect_error);
+        $this->con = new mysqli($servername, $username, $password, $dbname);
+        if ($this->con->connect_error) {
+            die("Connection failed: " . $this->con->connect_error);
         }
     }
 
     public function __destruct()
     {
-        $this->conn->close();
+        $this->con->close();
     }
 
-    public function setData($text, $status)
+    public function getAll()
     {
-        if ($status === '') {
-            $status = 0;
-        }
-        $d = new DateTime();
-        $d->setTimezone(new DateTimeZone('Europe/Riga'));
-        $createdAt =  $d->format("Y-m-d H:m:s");
-        $modifiedAt = $d->format("Y-m-d H:m:s");
-
-        $this->set([
-            'text' => $text,
-            'status' => $status,
-            'createdAt' => $createdAt,
-            'modifiedAt' => $modifiedAt
-        ]);
-    }
-
-    public function get()
-    {
-        $sql = "SELECT * FROM `$this->table`";
-        $result = $this->conn->query($sql);
+        $sql = "SELECT id FROM `$this->table`";
+        $result = $this->con->query($sql);
 
         if ($result) {
             if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    template($row['id'], $row['text'], $row['status']);
-                }
+                echo "<table><tr>
+          <th>ID</th>
+          <th>URL</th>
+          <th>Delete</th>
+          </tr>";
+
+                while ($row = $result->fetch_assoc()) :
+?>
+                    <tr>
+                        <td><?= $row['id'] ?></td>
+                        <td><a href="?game-id=<?= $row['id'] ?>">Game</a></td>
+                    </tr>
+<?php
+                    $this->last_message = json_encode($row) . "<br>";
+                endwhile;
+                echo "</table>";
             } else {
                 $this->last_message = "0 results";
             }
         } else {
             $this->last_message = "Result is wrong";
+        }
+    }
+
+    public function get($id)
+    {
+        $sql = "SELECT * FROM `$this->table` WHERE id=$id";
+        $result = $this->con->query($sql);
+
+        if ($result) {
+            if ($result->num_rows > 0) {
+                return $result->fetch_assoc();
+            } else {
+                $this->last_message = "0 results";
+            }
+        } else {
+            $this->last_message = "Result is wrong";
+        }
+    }
+
+    public function update($id, $values)
+    {
+        $set_values = '';
+        $i = 0;
+        foreach ($values as $key => $value) {
+            $i = $i + 1;
+            $set_values = $set_values . $key . "=" . "'$value'";
+            if (count($values) > $i) {
+                $set_values = $set_values . ", ";
+            }
+        }
+
+        $sql = "UPDATE `$this->table` SET $set_values WHERE id=$id";
+        $result = $this->con->query($sql);
+
+        if ($result === true) {
+            $this->last_message = "ieraksts izmainīts";
+        } else {
+            $this->last_message = "neizdevās updates";
         }
     }
 
@@ -79,39 +109,11 @@ class DB
         }
 
         $sql = "INSERT INTO `$this->table` ($columns) VALUES ($values);";
-        $result = $this->conn->query($sql);
+        $result = $this->con->query($sql);
         if ($result === true) {
-            $this->last_message = "ieraksts pievienots";
-            return $this->conn->insert_id;
+            return $this->con->insert_id;
         } else {
-            $this->last_message = $sql . "neizdevās inserts";
+            echo $this->con->error;
         }
-    }
-
-    public function update($id, $values)
-    {
-        $set_values = '';
-        $i = 0;
-        foreach ($values as $key => $value) {
-            $i = $i + 1;
-            $set_values = $set_values . $key . "=" . "'$value'";
-            if (count($values) > $i) {
-                $set_values = $set_values . ", ";
-            }
-        }
-
-        $sql = "UPDATE `$this->table` SET $set_values WHERE id=$id";
-        $result = $this->conn->query($sql);
-
-        if ($result === true) {
-            $this->last_message = "ieraksts izmainīts";
-        } else {
-            $this->last_message = "neizdevās updates";
-        }
-    }
-
-    public function delete()
-    {
-        echo 'test';
     }
 }

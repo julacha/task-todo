@@ -2,10 +2,13 @@
 function template($id, $text, $status)
 {
 ?>
-  <div class="<?= $status == 1 ? 'done' : ''; ?>" data-id="<?= $id; ?>">
+  <div onclick="markCompleted.bind(this)(event)" class="<?= $status == 1 ? 'done' : ''; ?>" data-id="<?= $id; ?>">
     <pre><?= $text; ?></pre>
 
-    <a href="/?remove=<?= $id; ?>" class="remove">x</a>
+    <div onclick="event.stopPropagation();">
+      <a href="/?remove=<?= $id; ?>" class="remove">x</a>
+      <a href="#update" class="update-link" startUpdate.bind(this)(event)">U</a>
+    </div>
   </div>
 <?php
 }
